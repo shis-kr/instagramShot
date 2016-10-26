@@ -398,20 +398,12 @@ public abstract class BaseInsta {
 				Point profileName = profileHeader.get(1).getLocation();
 				int xcordpro = profileName.getX();
 				int ycordpro = profileName.getY();
-				System.out.println(xcordpro);
-				System.out.println(ycordpro);
 				
 				Point profileNameHead = profileHeader.get(0).getLocation();
 				int xcordhead = profileNameHead.getX();
 				int ycordhead = profileNameHead.getY();
-				System.out.println(xcordhead);
-				System.out.println(ycordhead);
 				System.out.println("swiping for more images");
 				driver.swipe(xcordpro, ycordhead, xcordpro, ycordpro/3, 800);
-				
-				
-				
-				
 				takeScreenShot();
 			}
 			
