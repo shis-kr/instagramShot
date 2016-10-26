@@ -1,9 +1,13 @@
 package Tests;
 
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import org.testng.annotations.Test;
-import org.testng.AssertJUnit;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -13,61 +17,15 @@ import PageObjects.AppData;
 
 public class Test1 extends BaseInsta{
 
-	@Test
+	@Test(enabled=false)
 	public static void launch()
 	{
 		try
 		{
-			clickId(AppConstants.loginId);
-			AssertJUnit.assertTrue(findElementById(AppConstants.loginLogoId).isDisplayed());
-			sendKeysforId(AppConstants.userNameId, AppData.instagramPassword);
-			sendKeysforId(AppConstants.passwordId, AppData.instagramPassword);
-//			clickId(AppConstants.logIn);
-			AssertJUnit.assertTrue(findElementById(AppConstants.headerId).isDisplayed());
-			clickSearchTab();
-			clickId(AppConstants.searchBarId);
-			
-			sendKeysforId(AppConstants.searchBarId, AppData.searchKeyword);
-			
-//			clickId(AppConstants.fbloginId);
-//			// Switching to webview
-//			driver.manage().timeouts().implicitlyWait(4000, TimeUnit.SECONDS);
-//			Set<String> contextNames = driver.getContextHandles();
-//			for (String contextName : contextNames)
-//			{
-//				System.out.println(contextNames); //prints out something like [NATIVE_APP, WEBVIEW_<APP_PKG_NAME>]
-//			}
-////			driver.context(contextNames.toArray()[1]); // set context to WEBVIEW_<APP_PKG_NAME>
-////
-//////				do web testing
-////			String myText = driver.findElement(By.cssSelector(".green_button")).click();
-////
-//////				Switching back to NATIVE_APP
-////			driver.context("NATIVE_APP");
-////
-//////			 	do more native testing if we want
-////			 driver.findElement(By.name("home")).click();
-			clickProfileTab();
-			AssertJUnit.assertTrue(findElementById(AppConstants.profileActionBar).isDisplayed());
-			
-			WebElement profileBar = findElementById(AppConstants.profileActionBar);
-			WebElement profileOptions = profileBar.findElement(By.className("android.widget.ImageView"));
-			profileOptions.click();
-			
-			for(int i=0;i<10;i++)
-			{
-				if(driver.findElementsById(AppConstants.logoutCardId).size()>0)
-				{
-					clickId(AppConstants.logoutCardId);
-					break;
-				}
-				else
-				{
-					swipeTopVertically();
-				}
-			}
-			AssertJUnit.assertTrue(findElementById(AppConstants.logoutAlertId).isDisplayed());
-			clickId(AppConstants.logoutId);
+			login();
+			searchSomething(AppData.searchKeyword);
+			backbutton();
+			logout();
 		}
 		catch(Exception e)
 		{
@@ -76,4 +34,59 @@ public class Test1 extends BaseInsta{
 		}
 	}
 	
+	@Test()
+	public static void profileImageScreenshots()
+	{
+		try
+		{
+			login();
+			searchSomething(AppData.searchKeyword);
+			hideKeyboard();
+			List<WebElement> searchResult = findElementsbyId(AppConstants.searchRowResultId);
+			for(WebElement result : searchResult)
+			{
+				String userName = result.findElement(By.id(AppConstants.searchRowUserNameId)).getText();
+				if(userName.contains(AppData.shishirUserName))
+				{
+					result.click();
+					break;
+				}
+			}
+			Assert.assertTrue(driver.findElement(By.id(AppConstants.myProfileNameId)).isDisplayed());
+			driver.findElementById(AppConstants.photoLayoutOneId).click();
+			clickId(AppConstants.photoLayoutOneId);
+			
+			takeScreenshotProfileImages();
+			
+//			swipeTopVertically();
+//			int siz = findElementsbyId(AppConstants.profileImageHeaderId).size();
+//			System.out.println(siz);
+			
+			
+			
+			
+//			WebElement profileBar = findElementById(AppConstants.myProfileNameId);
+//			Point profileName = profileBar.getLocation();
+//			int xcordpro = profileName.getX();
+//			int ycordpro = profileName.getY();
+//			System.out.println(xcordpro);
+//			System.out.println(ycordpro);
+//			
+//			WebElement profileHeadImage = findElementById(AppConstants.profileImageHeaderId);
+//			Point profileNameHead = profileHeadImage.getLocation();
+//			int xcordhead = profileNameHead.getX();
+//			int ycordhead = profileNameHead.getY();
+//			System.out.println(xcordhead);
+//			System.out.println(ycordhead);
+//			
+//			driver.swipe(xcordhead, ycordhead, xcordpro, ycordpro/2, 800);
+//			
+			logout();
+		}
+		catch(Exception e)
+		{
+			System.out.println(e.getMessage());
+			e.getStackTrace();
+		}
+	}
 }

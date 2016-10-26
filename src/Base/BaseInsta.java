@@ -1,20 +1,32 @@
 package Base;
 
+import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.Point;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 
+import org.apache.commons.io.FileUtils;
+
 import PageObjects.AppConstants;
+import PageObjects.AppData;
 
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileElement;
@@ -219,37 +231,194 @@ public abstract class BaseInsta {
 	
 	public static void clickHome()
 	{
-		List<WebElement> tabs = findElementsbyId(AppConstants.bottomField);
+		List<WebElement> tabs = findElementsbyId(AppConstants.bottomFieldId);
 		tabs.get(0).click();
 	}
 	
 	public static void clickSearchTab()
 	{
-		List<WebElement> tabs = findElementsbyId(AppConstants.bottomField);
+		List<WebElement> tabs = findElementsbyId(AppConstants.bottomFieldId);
 		tabs.get(1).click();
 	}
 	
 	public static void clickPostTab()
 	{
-		List<WebElement> tabs = findElementsbyId(AppConstants.bottomField);
+		List<WebElement> tabs = findElementsbyId(AppConstants.bottomFieldId);
 		tabs.get(2).click();
 	}
 	
 	public static void clickNotificationsTab()
 	{
-		List<WebElement> tabs = findElementsbyId(AppConstants.bottomField);
+		List<WebElement> tabs = findElementsbyId(AppConstants.bottomFieldId);
 		tabs.get(3).click();
 	}
 	
 	public static void clickProfileTab()
 	{
-		List<WebElement> tabs = findElementsbyId(AppConstants.bottomField);
+		List<WebElement> tabs = findElementsbyId(AppConstants.bottomFieldId);
 		tabs.get(4).click();
 	}
 	
 	public static void logout()
 	{
+		clickProfileTab();
+		Assert.assertTrue(findElementById(AppConstants.profileActionBar).isDisplayed());
 		
+		WebElement profileBar = findElementById(AppConstants.profileActionBar);
+		List<WebElement> profileOptions = profileBar.findElements(By.className("android.widget.ImageView"));
+		profileOptions.get(1).click();
+		
+		for(int i=0;i<10;i++)
+		{
+			if(driver.findElementsByName(AppConstants.LogoutText).size()>0)
+			{
+				clickName(AppConstants.LogoutText);
+				break;
+			}
+			else
+			{
+				swipeTopVertically();
+			}
+		}
+		Assert.assertTrue(findElementById(AppConstants.logoutAlertId).isDisplayed());
+		clickId(AppConstants.logoutId);
+		Assert.assertTrue(findElementById(AppConstants.loginLogoId).isDisplayed());
 	}
 	
+	public static void login()
+	{
+		clickId(AppConstants.loginId);
+		Assert.assertTrue(findElementById(AppConstants.loginLogoId).isDisplayed());
+		sendKeysforId(AppConstants.userNameId, AppData.username);
+		sendKeysforId(AppConstants.passwordId, AppData.instagramPassword);
+		clickId(AppConstants.logIn);
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id(AppConstants.profileActionBar)));
+		Assert.assertTrue(findElementById(AppConstants.headerId).isDisplayed());
+	}
+	
+	public static void backbutton()
+	{
+		clickId(AppConstants.backButtonId);
+	}
+	
+//	public static String screenShot(WebDriver driver, String path, String screenShotName)
+//	{
+//		String dest = "";
+//		try
+//		{
+//			TakesScreenshot ts = (TakesScreenshot) driver;
+//			File source = (File) ts.getScreenshotAs(OutputType.FILE);
+//			dest = path + "/" + screenShotName + ".png";
+//			System.out.println(path);
+//			File destination = new File(dest);
+//			FileUtils.copyFile(source, destination);
+//		}
+//		catch(Exception e)
+//		{
+//			System.out.println(e.getMessage());
+//			return e.getMessage();
+//		}
+//		
+//		return dest;
+//	}
+
+	
+	public static void takeScreenShot()
+	{
+		  String destDir = "screenshots";
+		  File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+		  SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy__hh_mm_ssaa");
+		  new File(destDir).mkdirs();
+		  String destFile = dateFormat.format(new Date()) + ".png";
+
+		  try 
+		  {
+		   FileUtils.copyFile(scrFile, new File(destDir + "/" + destFile));
+		  }
+		  catch (IOException e)
+		  {
+		   e.printStackTrace();
+		  }
+	}
+	
+	public static void searchSomething(String keyword)
+	{
+		clickSearchTab();
+		clickId(AppConstants.searchBarId);	
+		sendKeysforId(AppConstants.searchBarId, keyword);
+	}
+	
+	public static void clickSearchTop()
+	{
+		List<WebElement> tabs = findElementsbyId(AppConstants.searchTabsId);
+		tabs.get(0).click();
+	}
+	
+	public static void clickSearchPeople()
+	{
+		List<WebElement> tabs = findElementsbyId(AppConstants.searchTabsId);
+		tabs.get(0).click();
+	}
+	
+	public static void clickSearchTags()
+	{
+		List<WebElement> tabs = findElementsbyId(AppConstants.searchTabsId);
+		tabs.get(0).click();
+	}
+	
+	public static void clickSearchPlaces()
+	{
+		List<WebElement> tabs = findElementsbyId(AppConstants.searchTabsId);
+		tabs.get(0).click();
+	}
+	
+	public static void takeScreenshotProfileImages()
+	{
+		while(true)
+		{	
+			if(findElementsbyId(AppConstants.myProfileNameId).size()>0)
+			{
+				WebElement profileBar = findElementById(AppConstants.myProfileNameId);
+				WebElement profileHeadImage = findElementById(AppConstants.profileImageHeaderId);
+				Point profileName = profileBar.getLocation();
+				int xcordpro = profileName.getX();
+				int ycordpro = profileName.getY();
+				
+				Point profileNameHead = profileHeadImage.getLocation();
+				int xcordhead = profileNameHead.getX();
+				int ycordhead = profileNameHead.getY();					
+				driver.swipe(xcordpro, ycordhead, xcordpro, ycordpro/2, 800);
+				System.out.println("swiping for first image");
+				takeScreenShot();
+			}
+			
+			else if(findElementsbyId(AppConstants.profileImageHeaderId).size()==2)
+			{
+				List<WebElement> profileHeader = findElementsbyId(AppConstants.profileImageHeaderId);
+				Point profileName = profileHeader.get(1).getLocation();
+				int xcordpro = profileName.getX();
+				int ycordpro = profileName.getY();
+				System.out.println(xcordpro);
+				System.out.println(ycordpro);
+				
+				Point profileNameHead = profileHeader.get(0).getLocation();
+				int xcordhead = profileNameHead.getX();
+				int ycordhead = profileNameHead.getY();
+				System.out.println(xcordhead);
+				System.out.println(ycordhead);
+				System.out.println("swiping for more images");
+				driver.swipe(xcordpro, ycordhead, xcordpro, ycordpro/3, 800);
+				
+				
+				
+				
+				takeScreenShot();
+			}
+			
+			else
+			{
+				break;
+			}
+		}
+	}
 }
